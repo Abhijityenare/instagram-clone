@@ -1,46 +1,53 @@
-import React,{useState} from 'react'
-import { Link } from 'react-router'
-import axios from 'axios'
-import '../styles/form.scss'
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
+import '../style/form.scss'
 const Login = () => {
 
-  const [username, setusername] = useState('')
-  const [password, setpassword] = useState('')
+  const {user,loading,handleLogin}= useAuth()
 
-  async function submitHandler(e){
+  const [username, setusername] = useState("")
+  const [password, setpassword] = useState("")
+
+  const navigate = useNavigate()
+
+  const submitHandler = async (e)=>{
     e.preventDefault()
-    
-    axios.post('http://localhost:3000/api/auth/login',{
-      username,
-      password
-    },{
-      withCredentials:true
-    }).then(res=>{
-      console.log(res.data); 
-    })
+
+    await handleLogin(username,password)
+
+    navigate('/')
+  }
+
+  if (loading) {
+      return (
+        <main>
+          <h1>Loading.......</h1>
+        </main>
+      )    
   }
   return (
-    <div>
-      <main>
-        <div className="form-container">
-            <h1>Login</h1>
-            <form onSubmit={submitHandler}>
+    <main>
+      <div className="form-container">
+              <h1>Login</h1>
+              <form onSubmit={submitHandler}>
                 <input 
                 onInput={(e)=>{setusername(e.target.value)}}
                 type="text" 
                 name='username' 
+                id='username' 
                 placeholder='enter username' />
-                <input
-                  onInput={(e)=>{setpassword(e.target.value)}}
+                <input 
+                onInput={(e)=>{setpassword(e.target.value)}}
                 type="password" 
                 name='password' 
+                id='password' 
                 placeholder='enter password' />
-                <button type='submit'>Login</button>
-            </form>
-            <p>Don't have an account? <Link className='toggleAuthForm' to="/register">Register</Link></p>
-        </div>
-      </main>
-    </div>
+                <button className='button primary-buttonn' >Login</button>
+              </form>
+              <p>Don't have an account? <Link className='toggleAuthForm' to="/register">Register</Link></p>
+      </div>
+    </main>
   )
 }
 
